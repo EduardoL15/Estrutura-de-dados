@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+
+#define MAXIMO 100
+
+float calcularMedia(float notas[], int numNotas) {
+    float soma = 0;
+    int i;
+
+    for (i = 0; i < numNotas; i++) {
+        soma += notas[i];
+    }
+    return soma / numNotas;
+}
+
+char* determinarSituacao(float media) {
+    if (media >= 7.0) {
+        return "Aprovado!";
+    } else {
+        return "Reprovado!";
+    }
+}
+
+int main() {
+    system("cls");
+    setlocale(LC_ALL,"Portuguese");
+
+    FILE *entrada, *saida;
+
+    char linha[MAXIMO];
+    char nome[MAXIMO], telefone[MAXIMO], curso[MAXIMO];
+    float notas[10];
+    int numNotas;
+    int pLinha = 1;
+
+    entrada = fopen("DadosEntrada.csv", "r");
+    if (entrada == NULL) {
+        printf("Erro ao abrir o arquivo de entrada.\n");
+        return 1;
+    }
+
+    saida = fopen("SituacaoFinal1.csv", "w");
+    if (saida == NULL) {
+        printf("Erro ao abrir o arquivo de saída.\n");
+        return 1;
+    }
+
+    fprintf(saida, "Nome,Media,Situacao\n");
+
+    while (fgets(linha, MAXIMO, entrada) != NULL) {
+        if (pLinha) {
+            pLinha = 0;
+            continue;
+        }
+
+        sscanf(linha, "%[^,],%[^,],%[^,],%f,%f,%f,%f,%f", nome, telefone, curso, &notas[0], &notas[1], &notas[2], &notas[3], &notas[4]);
+
+        numNotas = sscanf(linha, "%[^,],%[^,],%*[^,],%f,%f,%f,%f,%f", &notas[0], &notas[1], &notas[2], &notas[3], &notas[4]);
+
+        float media = calcularMedia(notas, numNotas);
+
+        char* situacao = determinarSituacao(media);
+
+        fprintf(saida, "%s,%.2f,%s\n", nome, media, situacao);
+    }
+
+    fclose(entrada);
+    fclose(saida);
+
+    printf("Processo executado com sucesso.\n");
+
+    return 0;
+}
